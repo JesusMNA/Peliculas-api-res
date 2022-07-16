@@ -10,10 +10,11 @@ arrowBtn.addEventListener('click', () => {
     location.hash = '#home'
 })
 
-window.addEventListener("DOMContentLoaded", navigator, false);
+window.addEventListener("DOMContentLoaded", navigator(), false);
 window.addEventListener("hashchange", navigator(), false);
 
 function navigator() {
+    window.scrollTo(0,0);
     if(location.hash.startsWith('#trends')) {
         trendsPage();
     }
@@ -63,6 +64,11 @@ function categoriesPage() {
     categoriesPreviewSection.classList.add('inactive');
     genericSection.classList.remove('inactive');
     movieDetailSection.classList.add('inactive');
+
+    const [_, categoryData] = location.hash.split('=') // ['#category', 'id-name']
+    const [categoryId, categoryName] = categoryData.split('-');
+
+    getMoviesByCategory(categoryId, categoryName);
 }
 
 function movieDetailsPage() {
