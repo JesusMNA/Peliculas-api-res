@@ -60,6 +60,13 @@ async function getMoviesBySearch(query) {
     printMovies(movies, genericSection);
 }
 
+async function getTrendigMovies() {
+    const { data } = await api('trending/movie/day');
+
+    const movies = data.results;
+    printMovies(movies, genericSection);
+}
+
 // Helpers
 
 function printMovies(movies, place) {
