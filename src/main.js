@@ -19,24 +19,7 @@ async function getCategoriesPreview() {
     const { data } = await api('genre/movie/list');
 
     const categories = data.genres;
-    categoriesPreviewList.innerHTML = "";
-    categories.forEach(category => {
-
-        const categoryContainer = document.createElement('div');
-        categoryContainer.classList.add('category-container');
-
-        const categoryTitle = document.createElement('h3');
-        categoryTitle.classList.add('category-title');
-        categoryTitle.setAttribute('id', 'id' + category.id);
-        categoryTitle.addEventListener('click', () => {
-            location.hash = `#category=${category.id}-${category.name}`;
-        })
-        const categoryTitleText = document.createTextNode(category.name);
-
-        categoryTitle.appendChild(categoryTitleText);
-        categoryContainer.appendChild(categoryTitle);
-        categoriesPreviewList.appendChild(categoryContainer);
-    });
+    createCategorires(categories, categoriesPreviewList);
 }
 
 async function getMoviesByCategory(id, categoryName) {
@@ -67,6 +50,26 @@ async function getTrendigMovies() {
     printMovies(movies, genericSection);
 }
 
+async function getMovieById(id) {
+    const { data: movie } = await api(`movie/${id}`);
+
+    const movieImgUrl = 'https://image.tmdb.org/t/p/w500' + movie.poster_path;
+    headerSection.style.backgroundImage = `url("${movieImgUrl}")`;
+
+    movieDetailTitle.textContent = movie.title;
+    movieDetailDescription.textContent = movie.overview;
+    movieDetailScore.textContent = movie.vote_average;
+
+    createCategorires(movie.genres, movieDetailCategoriesList);
+    getRelatedMoviesId(id);
+}
+
+async function getRelatedMoviesId(id) {
+    const { data } = await api(`movie/${id}/similar`);
+    const movie = data.results;
+    printMovies(movie, relatedMoviesContainer)
+}
+
 // Helpers
 
 function printMovies(movies, place) {
@@ -75,6 +78,9 @@ function printMovies(movies, place) {
 
         const movieContainer = document.createElement('div');
         movieContainer.classList.add('movie-container');
+        movieContainer.addEventListener("click", () => {
+            location.hash = '#movie=' + movie.id;
+        })
 
         const movieImg = document.createElement('img');
         movieImg.classList.add('movie-img');
@@ -86,5 +92,26 @@ function printMovies(movies, place) {
 
         movieContainer.appendChild(movieImg);
         place.appendChild(movieContainer);
+    });
+}
+
+function createCategorires(categories, place) {
+    place.innerHTML = "";
+    categories.forEach(category => {
+
+        const categoryContainer = document.createElement('div');
+        categoryContainer.classList.add('category-container');
+
+        const categoryTitle = document.createElement('h3');
+        categoryTitle.classList.add('category-title');
+        categoryTitle.setAttribute('id', 'id' + category.id);
+        categoryTitle.addEventListener('click', () => {
+            location.hash = `#category=${category.id}-${category.name}`;
+        })
+        const categoryTitleText = document.createTextNode(category.name);
+
+        categoryTitle.appendChild(categoryTitleText);
+        categoryContainer.appendChild(categoryTitle);
+        place.appendChild(categoryContainer);
     });
 }
