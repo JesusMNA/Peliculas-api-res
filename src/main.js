@@ -12,7 +12,6 @@ async function getTrendigMoviesPreview() {
     const { data } = await api('trending/movie/day');
 
     const movies = data.results;
-    trendingMoviesPreviewList.innerHTML = "";
     printMovies(movies, trendingMoviesPreviewList);
 }
 
@@ -47,12 +46,24 @@ async function getMoviesByCategory(id, categoryName) {
         },
     });
     const movies = data.results;
-    genericSection.innerHTML = "";
     headerCategoryTitle.innerHTML = categoryName;
     printMovies(movies, genericSection);
 }
 
+async function getMoviesBySearch(query) {
+    const { data } = await api('search/movie', {
+        params: {
+            query: query,
+        },
+    });
+    const movies = data.results;
+    printMovies(movies, genericSection);
+}
+
+// Helpers
+
 function printMovies(movies, place) {
+    place.innerHTML = "";
     movies.forEach(movie => {
 
         const movieContainer = document.createElement('div');
