@@ -12,7 +12,7 @@ async function getTrendigMoviesPreview() {
     const { data } = await api('trending/movie/day');
 
     const movies = data.results;
-    printMovies(movies, trendingMoviesPreviewList, true);
+    printMovies(movies, trendingMoviesPreviewList, { lazyLoad: true });
 }
 
 async function getCategoriesPreview() {
@@ -30,7 +30,7 @@ async function getMoviesByCategory(id, categoryName) {
     });
     const movies = data.results;
     headerCategoryTitle.innerHTML = categoryName;
-    printMovies(movies, genericSection,true);
+    printMovies(movies, genericSection, { lazyLoad: true, clean: true});
 }
 
 async function getMoviesBySearch(query) {
@@ -40,14 +40,38 @@ async function getMoviesBySearch(query) {
         },
     });
     const movies = data.results;
-    printMovies(movies, genericSection, true);
+    printMovies(movies, genericSection, { lazyLoad: true, clean: true });
 }
 
 async function getTrendigMovies() {
     const { data } = await api('trending/movie/day');
-
     const movies = data.results;
-    printMovies(movies, genericSection, true);
+    
+    printMovies(movies, genericSection, { lazyLoad: true, clean: true });
+
+    const btnLoadMore = document.createElement("button");
+    btnLoadMore.innerText = "Cargar mas";
+    btnLoadMore.addEventListener("click", getPaginatedTrendingMovies)
+    genericSection.appendChild(btnLoadMore)
+}
+
+let page = 1;
+
+async function getPaginatedTrendingMovies() {
+    page++;
+    const { data } = await api('trending/movie/day', {
+        params: {
+            page: page
+        }
+    });
+    const movies = data.results;
+    
+    printMovies(movies, genericSection, { clean: false });
+
+    const btnLoadMore = document.createElement("button");
+    btnLoadMore.innerText = "Cargar mas";
+    btnLoadMore.addEventListener("click", getPaginatedTrendingMovies)
+    genericSection.appendChild(btnLoadMore)
 }
 
 async function getMovieById(id) {
@@ -72,8 +96,17 @@ async function getRelatedMoviesId(id) {
 
 // Helpers
 
-function printMovies(movies, place, lazyLoad = false) {
-    place.innerHTML = "";
+function printMovies(
+    movies, 
+    place, 
+    { 
+        lazyLoad = false, 
+        clean = true 
+    } = {}
+    ) {
+    if (clean) {
+        place.innerHTML = "";
+    }
     movies.forEach(movie => {
 
         const movieContainer = document.createElement('div');
