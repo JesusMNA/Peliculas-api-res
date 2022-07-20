@@ -30,7 +30,7 @@ async function getMoviesByCategory(id, categoryName) {
     });
     const movies = data.results;
     headerCategoryTitle.innerHTML = categoryName;
-    printMovies(movies, genericSection);
+    printMovies(movies, genericSection,true);
 }
 
 async function getMoviesBySearch(query) {
@@ -40,14 +40,14 @@ async function getMoviesBySearch(query) {
         },
     });
     const movies = data.results;
-    printMovies(movies, genericSection);
+    printMovies(movies, genericSection, true);
 }
 
 async function getTrendigMovies() {
     const { data } = await api('trending/movie/day');
 
     const movies = data.results;
-    printMovies(movies, genericSection);
+    printMovies(movies, genericSection, true);
 }
 
 async function getMovieById(id) {
@@ -67,7 +67,7 @@ async function getMovieById(id) {
 async function getRelatedMoviesId(id) {
     const { data } = await api(`movie/${id}/similar`);
     const movie = data.results;
-    printMovies(movie, relatedMoviesContainer)
+    printMovies(movie, relatedMoviesContainer, true)
 }
 
 // Helpers
@@ -89,7 +89,12 @@ function printMovies(movies, place, lazyLoad = false) {
             lazyLoad ? 'data-img' : 'src', 
             'https://image.tmdb.org/t/p/w300' + movie.poster_path
         );
-
+        movieImg.addEventListener("error", () =>{
+            movieImg.setAttribute(
+                'src',
+                'https://image.tmdb.org/t/p/w300/vd7GyPkDvDDfvcxgWAfkGpKiAkH.jpg'
+            );
+        })
         if(lazyLoad) {
             observer.observe(movieImg);
         }
