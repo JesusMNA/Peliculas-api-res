@@ -12,7 +12,7 @@ async function getTrendigMoviesPreview() {
     const { data } = await api('trending/movie/day');
 
     const movies = data.results;
-    printMovies(movies, trendingMoviesPreviewList);
+    printMovies(movies, trendingMoviesPreviewList, true);
 }
 
 async function getCategoriesPreview() {
@@ -72,7 +72,7 @@ async function getRelatedMoviesId(id) {
 
 // Helpers
 
-function printMovies(movies, place) {
+function printMovies(movies, place, lazyLoad = false) {
     place.innerHTML = "";
     movies.forEach(movie => {
 
@@ -86,9 +86,13 @@ function printMovies(movies, place) {
         movieImg.classList.add('movie-img');
         movieImg.setAttribute('alt', movie.title);
         movieImg.setAttribute(
-            'src', 
+            lazyLoad ? 'data-img' : 'src', 
             'https://image.tmdb.org/t/p/w300' + movie.poster_path
         );
+
+        if(lazyLoad) {
+            observer.observe(movieImg);
+        }
 
         movieContainer.appendChild(movieImg);
         place.appendChild(movieContainer);
@@ -115,3 +119,16 @@ function createCategorires(categories, place) {
         place.appendChild(categoryContainer);
     });
 }
+
+//Intersection Observer
+
+const callback = (entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const url = entry.target.getAttribute('data-img');
+            entry.target.setAttribute('src', url);
+        }
+    })
+}
+
+let observer = new IntersectionObserver(callback);
