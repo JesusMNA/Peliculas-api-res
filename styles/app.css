@@ -216,6 +216,14 @@ button {
   width: 45%;
 }
 
+.category-esqueleton {
+  height: 29px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
 .category-title {
   margin-bottom: 8px;
   cursor: pointer;
@@ -273,6 +281,18 @@ button {
   width: 100%;
 }
 
+.generic-esqueleton {
+  min-width: 25vw;
+  max-width: 40vw;
+  height: 250px;
+  min-height: 250px;
+  max-height: 950px;
+  margin-bottom: 8px;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 8px;
+  animation: skeleton-loading 1s linear infinite alternate;
+}
 
 /* Movie Detail */
 .movieDetail-container {
@@ -356,4 +376,28 @@ footer {
 /* Navigation */
 .inactive {
   display: none;
+}
+
+.esqueleton-container {
+  height: 225px;
+  min-height: 225px;
+  max-height: 225px;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+  background-color: #CAD297;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 8px;
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 70%);
+  }
+
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
 }
