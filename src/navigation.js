@@ -1,3 +1,7 @@
+let maxPage;
+let page = 1;
+let infiniteScroll;
+
 searchFormBtn.addEventListener('click', () => { 
     location.hash = '#search=' + searchFormInput.value;
 })
@@ -10,10 +14,17 @@ arrowBtn.addEventListener('click', () => {
     history.back();
 })
 
-window.addEventListener("DOMContentLoaded", navigator(), false);
-window.addEventListener("hashchange", navigator(), false);
+window.addEventListener("DOMContentLoaded", navigator, false);
+window.addEventListener("hashchange", navigator, false);
+window.addEventListener("scroll", infiniteScroll, false);
+relatedMoviesContainer.addEventListener("scroll", infiniteScroll, false);
 
 function navigator() {
+    if (infiniteScroll) {
+        window.removeEventListener('scroll', infiniteScroll, { passive: false });
+        infiniteScroll = undefined;
+    }
+
     if(location.hash.startsWith('#trends')) {
         trendsPage();
     }
@@ -31,6 +42,10 @@ function navigator() {
     }
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
+
+    if (infiniteScroll) {
+        window.addEventListener('scroll', infiniteScroll, false)
+    }
 }
 
 function homePage() {
@@ -69,6 +84,7 @@ function categoriesPage() {
     const [categoryId, categoryName] = categoryData.split('-');
 
     getMoviesByCategory(categoryId, categoryName);
+    infiniteScroll = getPaginatedMoviesByCategory(categoryId)
 }
 
 function movieDetailsPage() {
@@ -87,6 +103,7 @@ function movieDetailsPage() {
     // ['#search', 'id']
     const [_, movieId] = location.hash.split('=') 
     getMovieById(movieId);
+    infiniteScroll = getPaginatedRelatedMovies(movieId);
 }
 
 function searchPage() {
@@ -105,6 +122,8 @@ function searchPage() {
     // ['#search', 'buscado']
     const [_, query] = location.hash.split('=') 
     getMoviesBySearch(query);
+
+    infiniteScroll = getPaginatedSearchMovies(query)
 }
 
 function trendsPage() {
@@ -121,5 +140,6 @@ function trendsPage() {
     genericSection.classList.remove('inactive');
     movieDetailSection.classList.add('inactive');
     headerCategoryTitle.innerHTML = 'Tendencias';
-    getTrendigMovies()
+    getTrendigMovies();
+    infiniteScroll = getPaginatedTrendingMovies;
 }

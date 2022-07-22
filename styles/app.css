@@ -345,6 +345,7 @@ button {
   white-space: nowrap;
   width: calc(100vw - 24px);
   padding-bottom: 16px;
+  max-height: 187px;
 }
 
 .relatedMovies-scrollContainer .movie-container {

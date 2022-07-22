@@ -23,55 +23,102 @@ async function getCategoriesPreview() {
 }
 
 async function getMoviesByCategory(id, categoryName) {
+    page = 1;
     const { data } = await api('discover/movie', {
         params: {
             with_genres: id,
         },
     });
     const movies = data.results;
+    maxPage = data.total_pages;
     headerCategoryTitle.innerHTML = categoryName;
     printMovies(movies, genericSection, { lazyLoad: true, clean: true});
 }
 
+function getPaginatedMoviesByCategory(id) {
+    return async function() {
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        const scrollIsBottom = ((scrollTop + clientHeight) >= (scrollHeight - 15));
+        const pageIsNotMax = page < maxPage;
+        if (scrollIsBottom && pageIsNotMax) {
+            page++;
+            const { data } = await api('discover/movie', {
+                params: {
+                    with_genres: id,
+                    page
+                },
+            });
+            const movies = data.results;
+            printMovies(movies, genericSection, { lazyLoad: true, clean: false});
+        }
+    }
+}
+
 async function getMoviesBySearch(query) {
+    page = 1;
     const { data } = await api('search/movie', {
         params: {
             query: query,
         },
     });
     const movies = data.results;
+    maxPage = data.total_pages;
     printMovies(movies, genericSection, { lazyLoad: true, clean: true });
+}
+
+function getPaginatedSearchMovies(query) {
+    return async function () {
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        const scrollIsBottom = ((scrollTop + clientHeight) >= (scrollHeight - 15));
+        const pageIsNotMax = page < maxPage;
+        if (scrollIsBottom && pageIsNotMax) {
+            page++;
+            const { data } = await api('search/movie', {
+                params: {
+                    query: query,
+                    page: page
+                },
+            });
+            const movies = data.results;
+            printMovies(movies, genericSection, { lazyLoad: true, clean: false });
+        }
+    }
 }
 
 async function getTrendigMovies() {
+    page = 1;
     const { data } = await api('trending/movie/day');
     const movies = data.results;
+    maxPage = data.total_pages;
     
     printMovies(movies, genericSection, { lazyLoad: true, clean: true });
 
-    const btnLoadMore = document.createElement("button");
-    btnLoadMore.innerText = "Cargar mas";
-    btnLoadMore.addEventListener("click", getPaginatedTrendingMovies)
-    genericSection.appendChild(btnLoadMore)
+    // const btnLoadMore = document.createElement("button");
+    // btnLoadMore.innerText = "Cargar mas";
+    // btnLoadMore.addEventListener("click", getPaginatedTrendingMovies)
+    // genericSection.appendChild(btnLoadMore)
 }
 
-let page = 1;
-
 async function getPaginatedTrendingMovies() {
-    page++;
-    const { data } = await api('trending/movie/day', {
-        params: {
-            page: page
-        }
-    });
-    const movies = data.results;
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    const scrollIsBottom = ((scrollTop + clientHeight) >= (scrollHeight - 15));
+    const pageIsNotMax = page < maxPage;
+    if (scrollIsBottom && pageIsNotMax) {
+        page++;
+        const { data } = await api('trending/movie/day', {
+            params: {
+                page: page
+            }
+        });
+        const movies = data.results;
     
-    printMovies(movies, genericSection, { clean: false });
+        printMovies(movies, genericSection, { clean: false });   
+    }
 
-    const btnLoadMore = document.createElement("button");
-    btnLoadMore.innerText = "Cargar mas";
-    btnLoadMore.addEventListener("click", getPaginatedTrendingMovies)
-    genericSection.appendChild(btnLoadMore)
+    // const btnLoadMore = document.createElement("button");
+    // btnLoadMore.innerText = "Cargar mas";
+    // btnLoadMore.addEventListener("click", getPaginatedTrendingMovies)
+    // genericSection.appendChild(btnLoadMore)
 }
 
 async function getMovieById(id) {
@@ -89,9 +136,30 @@ async function getMovieById(id) {
 }
 
 async function getRelatedMoviesId(id) {
+    page = 1;
     const { data } = await api(`movie/${id}/similar`);
     const movie = data.results;
-    printMovies(movie, relatedMoviesContainer, true)
+    maxPage = data.total_pages;
+    printMovies(movie, relatedMoviesContainer, {clean: true, lazyLoad: true})
+}
+
+function getPaginatedRelatedMovies(id) {
+    return async function() {
+        const scrollWidthScreen = document.documentElement.scrollWidth;
+        const { scrollLeft, scrollWidth } = relatedMoviesContainer;
+        const scrollIsEnd = ((scrollWidth + scrollLeft) >= (scrollWidthScreen - 100));
+        const pageIsNotMax = page < maxPage;
+        if (scrollIsEnd && pageIsNotMax) {
+            page++;
+            const { data } = await api(`movie/${id}/similar`, {
+                params: {
+                    page
+                }
+            });
+            const movie = data.results;
+            printMovies(movie, relatedMoviesContainer, {clean: false, lazyLoad: true})
+        }
+    }
 }
 
 // Helpers
