@@ -11,11 +11,13 @@ const trendingMoviesPreviewList = document.querySelector('.trendingPreview-movie
 const categoriesPreviewList = document.querySelector('.categoriesPreview-list');
 const movieDetailCategoriesList = document.querySelector('#movieDetail .categories-list');
 const relatedMoviesContainer = document.querySelector('.relatedMovies-scrollContainer');
+const clikedMoviesList = document.querySelector('.liked-movieList');
 
 // Elements
 const headerTitle = document.querySelector('.header-title');
 const arrowBtn = document.querySelector('.header-arrow');
 const headerCategoryTitle = document.querySelector('.header-title--categoryView');
+const likedTitle = document.querySelector(".liked-title")
 
 const searchFormInput = document.querySelector('#searchForm input');
 const searchFormBtn = document.querySelector('#searchBtn');

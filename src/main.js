@@ -8,6 +8,34 @@ const api = axios.create({
     }
 });
 
+function likedMoviesList() {
+    const item = JSON.parse(localStorage.getItem("liked_movies"));
+    let movies;
+
+    if (item) {
+        movies = item;
+    }
+    else {
+        movies = {};
+    }
+
+    return movies;
+}
+
+function likeMovie(movie) {
+
+    const likedMovies = likedMoviesList()
+
+    if (likedMovies[movie.id]) {
+        likedMovies[movie.id] = undefined;
+    }
+    else {
+        likedMovies[movie.id] = movie
+    }
+
+    localStorage.setItem('liked_movies',JSON.stringify(likedMovies))
+}
+
 async function getTrendigMoviesPreview() {
     const { data } = await api('trending/movie/day');
 
@@ -179,11 +207,11 @@ function printMovies(
 
         const movieContainer = document.createElement('div');
         movieContainer.classList.add('movie-container');
-        movieContainer.addEventListener("click", () => {
-            location.hash = '#movie=' + movie.id;
-        })
 
         const movieImg = document.createElement('img');
+        movieImg.addEventListener("click", () => {
+            location.hash = '#movie=' + movie.id;
+        })
         movieImg.classList.add('movie-img');
         movieImg.setAttribute('alt', movie.title);
         movieImg.setAttribute(
@@ -196,11 +224,30 @@ function printMovies(
                 'https://image.tmdb.org/t/p/w300/vd7GyPkDvDDfvcxgWAfkGpKiAkH.jpg'
             );
         })
+
+        const movieBtn = document.createElement("button");
+        movieBtn.classList.add("movie-btn");
+
+        const likedMovie = likedMoviesList();
+        if(likedMovie[movie.id]) {
+            movieBtn.classList.add("movie-btn--liked")
+        }
+
+        movieBtn.addEventListener("click", () => {
+            movieBtn.classList.toggle('movie-btn--liked');
+            likeMovie(movie);
+            if(location.hash == '') {
+                getLikedMovies();
+                getTrendigMoviesPreview();
+            }
+        });
+
         if(lazyLoad) {
             observer.observe(movieImg);
         }
 
         movieContainer.appendChild(movieImg);
+        movieContainer.appendChild(movieBtn);
         place.appendChild(movieContainer);
     });
 }
@@ -224,6 +271,13 @@ function createCategorires(categories, place) {
         categoryContainer.appendChild(categoryTitle);
         place.appendChild(categoryContainer);
     });
+}
+
+function getLikedMovies() {
+    const likedMovies = likedMoviesList();
+    const moviesArray = Object.values(likedMovies);
+
+    printMovies(moviesArray, clikedMoviesList, { lazyLoad: true, clean: true });
 }
 
 //Intersection Observer
